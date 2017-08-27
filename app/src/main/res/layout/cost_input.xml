@@ -1,0 +1,19 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:padding="1dp"
+    android:layout_height="match_parent">
+
+    <EditText android:paddingLeft="@dimen/layout_padding"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:textSize="20dp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:gravity="center"
+        android:background="@android:color/white"
+        android:maxLength="4"
+        android:id="@+id/costInput" />
+</LinearLayout>
