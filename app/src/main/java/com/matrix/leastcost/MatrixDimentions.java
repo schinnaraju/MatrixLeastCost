@@ -22,13 +22,13 @@ public class MatrixDimentions extends AppCompatActivity {
                 EditText rowEt = (EditText) findViewById(R.id.maxRowInput);
                 EditText columnEt = (EditText) findViewById(R.id.maxColumnInput);
                 if(validateInput(rowEt) && validateInput(columnEt)) {
-                        SharedMethods.showInvalidInputDialog(MatrixDimentions.this, "Empty Input Found", "Kindly fill both values");
-                    } else {
-                        Intent matrixInputActivity = new Intent(MatrixDimentions.this, MatrixInput.class);
-                        matrixInputActivity.putExtra("rowMax", Integer.parseInt(rowEt.getText().toString()));
-                        matrixInputActivity.putExtra("columnMax", Integer.parseInt(columnEt.getText().toString()));
-                        startActivity(matrixInputActivity);
-                    }
+                    Intent matrixInputActivity = new Intent(MatrixDimentions.this, MatrixInput.class);
+                    matrixInputActivity.putExtra("rowMax", Integer.parseInt(rowEt.getText().toString()));
+                    matrixInputActivity.putExtra("columnMax", Integer.parseInt(columnEt.getText().toString()));
+                    startActivity(matrixInputActivity);
+                } else {
+                    SharedMethods.showInvalidInputDialog(MatrixDimentions.this, "Empty Input Found", "Kindly fill both values");
+                }
             }
         });
     }
