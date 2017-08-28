@@ -19,7 +19,16 @@ public class MatrixDimentions extends AppCompatActivity {
         findViewById(R.id.submitButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                validateInput();
+                EditText rowEt = (EditText) findViewById(R.id.maxRowInput);
+                EditText columnEt = (EditText) findViewById(R.id.maxColumnInput);
+                if(validateInput(rowEt) && validateInput(columnEt)) {
+                        SharedMethods.showInvalidInputDialog(MatrixDimentions.this, "Empty Input Found", "Kindly fill both values");
+                    } else {
+                        Intent matrixInputActivity = new Intent(MatrixDimentions.this, MatrixInput.class);
+                        matrixInputActivity.putExtra("rowMax", Integer.parseInt(rowEt.getText().toString()));
+                        matrixInputActivity.putExtra("columnMax", Integer.parseInt(columnEt.getText().toString()));
+                        startActivity(matrixInputActivity);
+                    }
             }
         });
     }
@@ -29,16 +38,8 @@ public class MatrixDimentions extends AppCompatActivity {
      *  step 2 : alert invalid input if either row or column is empty
      *  step 3 : start the maxtrix input activity and pass the row and cloumn specification as extra
      */
-    private void validateInput(){
-        String rowMax = ((EditText) findViewById(R.id.maxRowInput)).getText().toString();
-        String columnMax = ((EditText) findViewById(R.id.maxColumnInput)).getText().toString();
-        if(rowMax.isEmpty() || columnMax.isEmpty()){
-            SharedMethods.showInvalidInputDialog(this, "Empty Input Found", "Kindly fill " + (rowMax.isEmpty() ? "row" : "column") + " input.");
-        } else {
-            Intent matrixInputActivity = new Intent(this, MatrixInput.class);
-            matrixInputActivity.putExtra("rowMax", Integer.parseInt(rowMax));
-            matrixInputActivity.putExtra("columnMax", Integer.parseInt(columnMax));
-            startActivity(matrixInputActivity);
-        }
+
+    public boolean validateInput(EditText etText){
+        return etText.getText().toString().trim().length() > 0;
     }
 }

@@ -61,7 +61,7 @@
 
     <Button
         android:layout_marginTop="@dimen/layout_padding"
-        android:text="Button"
+        android:text="Submit"
         android:background="@color/colorPrimaryDark"
         android:layout_gravity="center_horizontal"
         android:layout_width="@dimen/button_width"

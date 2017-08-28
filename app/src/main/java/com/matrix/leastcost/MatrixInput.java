@@ -1,8 +1,6 @@
 package com.matrix.leastcost;
 
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,6 +9,7 @@ import android.widget.EditText;
 import android.widget.GridView;
 
 import com.matrix.leastcost.adapter.CostMatrixAdapter;
+import com.matrix.leastcost.beanclasses.LeastCostBean;
 import com.matrix.leastcost.utility.SharedMethods;
 
 import org.json.JSONArray;
@@ -68,7 +67,14 @@ public class MatrixInput extends AppCompatActivity {
                         }
                     }
                     if(hasAllInput) {
-                        calculateLeastPath(costMatrixArray);
+                        LeastCostBean outputData = calculateLeastPath(costMatrixArray);
+
+                        Intent leastPathResult = new Intent(MatrixInput.this, LeastPath.class);
+                        leastPathResult.putExtra("leastCost", outputData.getCost());
+                        leastPathResult.putExtra("isValidInput", outputData.getIsValidInput());
+                        leastPathResult.putExtra("leastPath", outputData.getLeastPath());
+
+                        startActivity(leastPathResult);
                     } else {
                         SharedMethods.showInvalidInputDialog(MatrixInput.this, "Empty Input Found", "Kindly fill cost in all matrix input.");
                     }
@@ -85,17 +91,19 @@ public class MatrixInput extends AppCompatActivity {
      *                   step 2 : Calculate the least path and cost associated amoung all rows traversal
      *                   step 3 : launch the result activity to display the values
      */
-    private void calculateLeastPath(int[][] costMatrix) {
-        ArrayList<JSONArray> leastCost = new ArrayList<JSONArray>();
-        // Calculate row wise least path
-        for (int row = 0; row < costMatrix.length; row++) {
-            leastCost.add(findLeastPath(row, 0, costMatrix));
-        }
-//        Log.d("leastCost", leastCost.toString());
-        JSONArray leastCostObj = getLeastPath(leastCost);
+    public LeastCostBean calculateLeastPath(int[][] costMatrix) {
+        JSONArray leastCostObj = new JSONArray();
+        LeastCostBean outputData = new LeastCostBean();
         try {
-//            Log.d("leastCostObj", leastCostObj.toString());
-            Intent leastPathResult = new Intent(this, LeastPath.class);
+            // Calculate least path
+            for (int row = 0; row < costMatrix.length; row++) {
+                JSONArray currentCostPath = findLeastPath(row, 0, costMatrix);
+                // If it is first path or the existing cost is higher than the new cost
+                if(leastCostObj.length() == 0 || leastCostObj.getInt(0) > currentCostPath.getInt(0)){
+                    leastCostObj = currentCostPath;
+                }
+            }
+
             int cost = leastCostObj.getInt(0);
             String isValidInput = cost > 50 ? "No" : "Yes";
             String leastPath = leastCostObj.getJSONArray(1).toString().replaceAll("[\\[\\]]", "");
@@ -108,38 +116,19 @@ public class MatrixInput extends AppCompatActivity {
                         break;
                     }
                     cost = cost + costMatrix[pathArray.getInt(index) - 1][index];
-                    leastPath = leastPath + (leastPath.isEmpty() ? "" : ", ") + pathArray.getInt(index);
+                    leastPath = leastPath + (leastPath.isEmpty() ? "" : ",") + pathArray.getInt(index);
                 }
             }
-            leastPathResult.putExtra("leastCost", cost);
-            leastPathResult.putExtra("isValidInput", isValidInput);
-            leastPathResult.putExtra("leastPath", leastPath);
-
-            startActivity(leastPathResult);
+            outputData.setCost(cost);
+            outputData.setLeastPath(leastPath);
+            outputData.setIsValidInput(isValidInput);
         } catch (JSONException e) {
             Log.e("JSON Exception", e.getLocalizedMessage());
         }
+
+        return outputData;
     }
 
-    /**
-     *
-     * @param leastCost : array of least paths (Row wise)
-     * @return :: the least cost and it's path
-     */
-    private JSONArray getLeastPath(ArrayList<JSONArray> leastCost){
-        JSONArray leastValueObj = new JSONArray();
-        try {
-            leastValueObj = leastCost.get(0);
-            for (int index = 1; index < leastCost.size(); index++) {
-                if (leastValueObj.getInt(0) > leastCost.get(index).getInt(0)) {
-                    leastValueObj = leastCost.get(index);
-                }
-            }
-        } catch (JSONException e){
-            Log.e("Exception getLeastPath", e.getLocalizedMessage());
-        }
-        return leastValueObj;
-    }
     /**
      *
      * @param row :: current row index, Used to find the least from sum of current row,col with next column and horizontal, diagonal up and diagonal down rows
@@ -205,4 +194,6 @@ public class MatrixInput extends AppCompatActivity {
         }
         return leastPath;
     }
+
+
 }
