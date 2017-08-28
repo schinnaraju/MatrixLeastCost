@@ -4,9 +4,9 @@ package com.matrix.leastcost.beanclasses;
  * Created by sampath_k on 26/08/17.
  */
 public class LeastCostBean {
-    private String isValidInput;
-    private int cost;
-    private String leastPath;
+    private String isValidInput = "Yes";
+    private int cost = 0;
+    private String leastPath = "";
 
     public LeastCostBean(String isValidInput, int cost, String leastPath) {
         this.isValidInput = isValidInput;
@@ -69,7 +69,7 @@ public class LeastCostBean {
         return "LeastCostBean{" +
                 "isValidInput='" + isValidInput + '\'' +
                 ", cost=" + cost +
-                ", leastPath='" + leastPath + '\'' +
-                '}';
+                ", leastPath=[" + leastPath  +
+                ']';
     }
 }

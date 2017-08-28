@@ -46,7 +46,7 @@ public class TestValues {
             {1},
             {1}};
 
-    public static LeastCostBean matrix1OutPut = new LeastCostBean("Yes",16,"1,2,3,4,4,5");
-    public static LeastCostBean matrix2OutPut = new LeastCostBean("Yes",11,"1,2,1,5,4,5");
-    public static LeastCostBean matrix3OutPut = new LeastCostBean("No",48,"1,1,1");
+    public static LeastCostBean matrix1OutPut = new LeastCostBean("Yes",16,"1, 2, 3, 4, 4, 5");
+    public static LeastCostBean matrix2OutPut = new LeastCostBean("Yes",11,"1, 2, 1, 5, 4, 5");
+    public static LeastCostBean matrix3OutPut = new LeastCostBean("No",48,"1, 1, 1");
 }

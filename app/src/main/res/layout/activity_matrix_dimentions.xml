@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:background="@color/colorPrimary"
     android:padding="@dimen/activity_vertical_margin"
-    tools:context="com.matrix.leastcost.MatrixDimentions">
+    tools:context="com.matrix.leastcost.MatrixDimensions">
 
     <LinearLayout
         android:layout_width="match_parent"

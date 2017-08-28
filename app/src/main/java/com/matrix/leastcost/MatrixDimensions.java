@@ -1,16 +1,14 @@
 package com.matrix.leastcost;
 
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 
 import com.matrix.leastcost.utility.SharedMethods;
 
-public class MatrixDimentions extends AppCompatActivity {
+public class MatrixDimensions extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,24 +20,24 @@ public class MatrixDimentions extends AppCompatActivity {
                 EditText rowEt = (EditText) findViewById(R.id.maxRowInput);
                 EditText columnEt = (EditText) findViewById(R.id.maxColumnInput);
                 if(validateInput(rowEt) && validateInput(columnEt)) {
-                    Intent matrixInputActivity = new Intent(MatrixDimentions.this, MatrixInput.class);
+                    Intent matrixInputActivity = new Intent(MatrixDimensions.this, MatrixInput.class);
                     matrixInputActivity.putExtra("rowMax", Integer.parseInt(rowEt.getText().toString()));
                     matrixInputActivity.putExtra("columnMax", Integer.parseInt(columnEt.getText().toString()));
                     startActivity(matrixInputActivity);
                 } else {
-                    SharedMethods.showInvalidInputDialog(MatrixDimentions.this, "Empty Input Found", "Kindly fill both values");
+                    SharedMethods.showInvalidInputDialog(MatrixDimensions.this, "Empty Input Found", "Kindly enter right dimensions.");
                 }
             }
         });
     }
-
     /**
      *  step 1 : check the input values
-     *  step 2 : alert invalid input if either row or column is empty
+     *  step 2 : alert invalid input if either row or column is "empty" or "0"
      *  step 3 : start the maxtrix input activity and pass the row and cloumn specification as extra
      */
 
     public boolean validateInput(EditText etText){
-        return etText.getText().toString().trim().length() > 0;
+        String inputDimension = etText.getText().toString().trim();
+        return inputDimension.length() > 0 && Integer.parseInt(inputDimension) > 0;
     }
 }

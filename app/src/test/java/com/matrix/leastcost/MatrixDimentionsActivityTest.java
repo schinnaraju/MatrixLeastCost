@@ -19,13 +19,13 @@ import static org.junit.Assert.assertNotNull;
 
 public class MatrixDimentionsActivityTest
 {
-    private MatrixDimentions activity;
+    private MatrixDimensions activity;
     private EditText rowEt,columnEt;
 
     @Before
     public void setUp() throws Exception
     {
-        activity = Robolectric.buildActivity( MatrixDimentions.class )
+        activity = Robolectric.buildActivity( MatrixDimensions.class )
                 .create()
                 .resume()
                 .get();

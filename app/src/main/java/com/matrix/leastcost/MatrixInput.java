@@ -1,9 +1,8 @@
 package com.matrix.leastcost;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.GridView;
@@ -14,8 +13,6 @@ import com.matrix.leastcost.utility.SharedMethods;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-
-import java.util.ArrayList;
 
 public class MatrixInput extends AppCompatActivity {
 
@@ -88,112 +85,98 @@ public class MatrixInput extends AppCompatActivity {
      *
      * @param costMatrix :: user matrix input to find the least cost path
      *                   step 1 : Calculate the least path and cost associated with each row
-     *                   step 2 : Calculate the least path and cost associated amoung all rows traversal
+     *                   step 2 : Calculate the least path and cost associated among all rows traversal
      *                   step 3 : launch the result activity to display the values
      */
-    public LeastCostBean calculateLeastPath(int[][] costMatrix) {
-        JSONArray leastCostObj = new JSONArray();
-        LeastCostBean outputData = new LeastCostBean();
-        try {
-            // Calculate least path
-            for (int row = 0; row < costMatrix.length; row++) {
-                JSONArray currentCostPath = findLeastPath(row, 0, costMatrix);
-                // If it is first path or the existing cost is higher than the new cost
-                if(leastCostObj.length() == 0 || leastCostObj.getInt(0) > currentCostPath.getInt(0)){
-                    leastCostObj = currentCostPath;
+    public LeastCostBean calculateLeastPath(int[][] costMatrix){
+        int leastCost = 0, leastRow = 0;
+        for (int col = 0; col < costMatrix[0].length; col++) {
+            for(int row = 0; row < costMatrix.length; row++){
+                if(col == 0) {
+                    costMatrix[row][col] = costMatrix[row][col];
+                } else {
+                    costMatrix[row][col] = costMatrix[row][col] + getLeastLeftValue(row, col, costMatrix);
+                }
+                if(col == costMatrix[0].length - 1){
+                    leastRow = row == 0 || costMatrix[row][col] < leastCost ? row : leastRow;
+                    leastCost = row == 0 || costMatrix[row][col] < leastCost ? costMatrix[row][col] : leastCost;
                 }
             }
-
-            int cost = leastCostObj.getInt(0);
-            String isValidInput = cost > 50 ? "No" : "Yes";
-            String leastPath = leastCostObj.getJSONArray(1).toString().replaceAll("[\\[\\]]", "");
-            if (cost > 50) {
-                cost = 0;
-                leastPath = "";
-                JSONArray pathArray = leastCostObj.getJSONArray(1);
-                for ( int index = 0; index < pathArray.length(); index++ ) {
-                    if(cost + costMatrix[pathArray.getInt(index) - 1][index] > 50) {
-                        break;
-                    }
-                    cost = cost + costMatrix[pathArray.getInt(index) - 1][index];
-                    leastPath = leastPath + (leastPath.isEmpty() ? "" : ",") + pathArray.getInt(index);
-                }
-            }
-            outputData.setCost(cost);
-            outputData.setLeastPath(leastPath);
-            outputData.setIsValidInput(isValidInput);
-        } catch (JSONException e) {
-            Log.e("JSON Exception", e.getLocalizedMessage());
         }
+        LeastCostBean leastCostBean = new LeastCostBean();
+        if(leastCost > 50) {
+            leastCostBean.setIsValidInput("No");
+        }
+        leastCostBean.setCost(leastCost);
+        leastCostBean = validateLeastPath(leastRow, costMatrix[0].length - 1, costMatrix, leastCostBean);
 
-        return outputData;
+        return leastCostBean;
     }
 
     /**
      *
-     * @param row :: current row index, Used to find the least from sum of current row,col with next column and horizontal, diagonal up and diagonal down rows
-     * @param col :: current column index
-     * @param matrix :: Cost matrix, least path calculation
-     * @return :: JSONArray value with least cost and its path of current row and column
+     * @param row row to find the least cost and previous least cost
+     * @param column column to find the least cost and previous least cost
+     * @param matrix : Matrix with least cost calculated with each node
+     * @param leastCostBean : least cost bean to map the result
+     * @return add the least cost and path and then return as class object
      */
-    private JSONArray findLeastPath(int row, int col, int[][] matrix){
-        JSONArray leastPathValue = new JSONArray();
-        try {
-            JSONArray leastPath = new JSONArray();
-            leastPath.put(row+1);
-            int least = matrix[row][col];;
-            if (col == matrix[0].length - 1) {
-                // Last column value hence return the cost and path associated with it
-                leastPathValue.put(least);
-                leastPathValue.put(leastPath);
-            } else {
-                // Calculate the least cost from next column & adjacent rows
-                int dowmIndex = row == matrix.length - 1 ? 0 : row + 1;
-                int upIndex = row == 0 ? matrix.length - 1 : row - 1;
+    private LeastCostBean validateLeastPath (int row, int column, int[][] matrix, LeastCostBean leastCostBean) {
+        String path = leastCostBean.getLeastPath();
 
-                JSONArray diagonalUp = findLeastPath(upIndex, (col + 1), matrix);
-                JSONArray horizontal = findLeastPath(row, (col + 1), matrix);
-                JSONArray diagonalDown = findLeastPath(dowmIndex, (col + 1), matrix);
-                if(diagonalUp.length() > 0) {
-                    int up = least + diagonalUp.getInt(0);
-                    int hori = least + horizontal.getInt(0);
-                    int down = least + diagonalDown.getInt(0);
-                    // Least cost amount the diagonal traversal
-                    least = Math.min(up, Math.min(hori, down));
-                    // Add the least cost path
-                    if (least == up) {
-                        addArrayPath(diagonalUp.getJSONArray(1), leastPath);
-                    } else if (least == down) {
-                        addArrayPath(diagonalDown.getJSONArray(1), leastPath);
-                    } else {
-                        addArrayPath(horizontal.getJSONArray(1), leastPath);
-                    }
-                }
-                leastPathValue.put(least);
-                leastPathValue.put(leastPath);
-            }
-        }catch (JSONException e){
-            Log.e("Exception findLeastPath", e.getLocalizedMessage());
+        if(leastCostBean.getCost() > 50){
+            // If the cost is more than 50 then assign the previous least value
+            leastCostBean.setCost(column == 0 ? 0 : matrix[findPreviousMinRow(row, column, matrix)][column - 1]);
+        } else {
+            // add the path only if the cost is lesser than 50
+            leastCostBean.setLeastPath( (path.isEmpty() ? ((row + 1) + "") : ((row + 1) + ", ")) + path);
         }
-        return leastPathValue;
+        // if it reaches to the start of matrix column then return
+        if(column == 0) {
+            return leastCostBean;
+        }
+
+        validateLeastPath(findPreviousMinRow(row, column, matrix), column - 1, matrix, leastCostBean);
+
+        return leastCostBean;
     }
 
     /**
      *
-     * @param currentPath :: Current least path array
-     * @param leastPath :: existing least path array
-     * @return :: merged least path array
+     * @param row : Current row to find the previous row
+     * @param column : current column
+     * @param matrix : previous least cost matrix with node's are already populated with least cost
+     * @return
      */
-    private JSONArray addArrayPath(JSONArray currentPath, JSONArray leastPath){
-        try {
-            for (int index = 0; index < currentPath.length(); index++) {
-                leastPath.put(currentPath.get(index));
-            }
-        }catch (JSONException e){
-            Log.e("Exception addArrayPath", e.getLocalizedMessage());
+    private int findPreviousMinRow(int row, int column, int[][] matrix){
+        // find the previous rows to get the minimal cost
+        int leftDiagonalDown = row == matrix.length - 1 ? 0 : row + 1;
+        int leftDiagonalUp = row == 0 ? matrix.length - 1 : row - 1;
+
+        int diagonalUp = matrix[leftDiagonalUp][column - 1];
+        int hori = matrix[row][column - 1];
+        int diagonalDown = matrix[leftDiagonalDown][column - 1];
+        // Least cost amount the diagonal traversal
+        int least = Math.min(diagonalUp, Math.min(hori, diagonalDown));
+        // Add the least cost path
+        int previousRow = row;
+        if (least == diagonalUp) {
+            previousRow = leftDiagonalUp;
+        } else if (least == diagonalDown) {
+            previousRow = leftDiagonalDown;
         }
-        return leastPath;
+        return previousRow;
     }
-
-
+    /**
+     *
+     * @param row : Current row
+     * @param col : Current column
+     * @param matrix : matrix
+     * @return return the minimum cost from previous diagonal up, down and horizontal values
+     */
+    private int getLeastLeftValue(int row, int col, int[][] matrix){
+        int leftDiagonalDown = row == matrix.length - 1 ? 0 : row + 1;
+        int leftDiagonalUp = row == 0 ? matrix.length - 1 : row - 1;
+        return Math.min(matrix[leftDiagonalUp][col-1], Math.min(matrix[leftDiagonalDown][col-1], matrix[row][col-1]));
+    }
 }
