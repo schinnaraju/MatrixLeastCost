@@ -24,7 +24,7 @@ public class SharedMethods {
                             dialog.dismiss();
                         }
                     })
-                    .setCancelable(false);
+                    .setCancelable(true);
 
             AlertDialog invalidInputDialog = alertDialogBuilder.create();
 
