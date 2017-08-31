@@ -1,5 +1,6 @@
 package com.matrix.leastcost;
 
+import android.widget.Button;
 import android.widget.EditText;
 
 import org.junit.Before;
@@ -21,7 +22,7 @@ public class MatrixDimentionsActivityTest
 {
     private MatrixDimensions activity;
     private EditText rowEt,columnEt;
-
+    private Button submit;
     @Before
     public void setUp() throws Exception
     {
@@ -32,6 +33,7 @@ public class MatrixDimentionsActivityTest
 
         rowEt = (EditText) activity.findViewById(R.id.maxRowInput);
         columnEt = (EditText) activity.findViewById(R.id.maxColumnInput);
+        submit = (Button) activity.findViewById(R.id.submitButton);
     }
 
     @Test
@@ -39,7 +41,18 @@ public class MatrixDimentionsActivityTest
     {
         assertNotNull( activity );
     }
-
+    @Test
+    public void performValidSubmitClick() throws Exception {
+        rowEt.setText("2");
+        columnEt.setText("2");
+        submit.performClick();
+    }
+    @Test
+    public void performInvalidSubmitClick() throws Exception {
+        rowEt.setText("");
+        columnEt.setText("");
+        submit.performClick();
+    }
     @Test
     public void validateColumnEditText1() throws Exception
     {
